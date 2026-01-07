@@ -11,6 +11,8 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://control.msg91.com/app/assets/otp-provider/otp-provider.js"></script>
+
     </head>
     <body>
         <div id="pageLoader" style="display:none;">
@@ -69,6 +71,7 @@
                             </div>
                             <!-- Hidden field for validation -->
                             <input type="hidden" name="otp" id="otp">
+                            <p id="otpMessage" class="otp-message" style="display:none;"></p>
                         </div>
                         <button type="submit" id="sbn-btn" class="btn-submit">
                             SUBMIT
@@ -78,46 +81,20 @@
                         *Your profile is registered in 'Corteva Farmer Connect' app and you authorize Corteva to contact you for future marketing activities.
                     </p>
                 </div>
-
             </div>
         </div>
-        <script src="https://control.msg91.com/app/assets/otp-provider/otp-provider.js"></script>
+
         <script>
             /* Init on page load */
             let currentStep = 1;
             let otpTouched = false;
             let msg91Ready = false;
             let currentMobile = '';
+            let name = '';
             let currentLang = "{{ $lang }}";
             let msg91Instance = null;
-
-            var configuration = {
-                widgetId: "3661646c366b363637353038",
-                tokenAuth: "486318THEpC5CKH695a6bd2P1",
-                identifier: "",
-                exposeMethods: true,
-                success: function (data) {
-                    console.log("✅ Widget callback - Operation successful", data);
-                },
-                failure: function (error) {
-                    console.error("❌ Widget callback - Operation failed", error);
-                }
-            };
-
             $(document).ready(function() {
                 initValidation(currentLang);
-
-                setTimeout(function() {
-                    if (typeof window.initSendOTP === 'function') {
-                        console.log("✅ Initializing MSG91 widget...");
-                        msg91Instance = window.initSendOTP(configuration);
-                        msg91Ready = true;
-                        console.log("✅ MSG91 is ready");
-                    } else {
-                        console.error('❌ MSG91 script not loaded');
-                    }
-                }, 500);
-
             });
 
             /* Language-wise Messages */
@@ -153,6 +130,11 @@
 
             /* Language-wise validation */
             function initValidation(lang) {
+                $('#otpLabel').text(
+                    lang === 'hi' ? 'OTP दर्ज करें' :
+                    lang === 'gu' ? 'OTP નાખો' :
+                    'Enter OTP'
+                );
                 if (lang === 'en') {
                     $('#banner_img').attr('src', 'https://galileo.farmerconnect.in/static/media/HindiBanner.626e325b6dfc3acf4a68.png');
                     $('#name').attr('placeholder', 'Name');
@@ -260,99 +242,116 @@
                 });
             });
             // Submit
-            $('.register_frm').on('submit', function (e) {
-                e.preventDefault();
+            $('.register_frm').on('submit', async function(e) {
+                try {
+                    e.preventDefault();
 
-                if (currentStep === 2) {
-                    otpTouched = true;
-                }
-
-                if (!$(this).valid()) return;
-
-                $('#pageLoader').fadeIn();
-
-                /* STEP 1 → SEND OTP */
-                if (currentStep === 1) {
-                    // Check all possible method names
-                    const sendMethod = window.sendOTP || window.sendOtp || window.SendOTP;
-
-                    if (!msg91Ready || !sendMethod) {
-                        console.error("Available window methods:", Object.keys(window).filter(k => k.toLowerCase().includes('otp')));
-                        alert("OTP service not ready. Please wait a moment and try again.");
-                        $('#pageLoader').fadeOut();
-                        return;
-                    }
-                    currentMobile = $('#mobile').val();
-
-                    // Use the exposed sendOTP method
-                    window.sendOTP(
-                        "91" + currentMobile,
-                        function (data) {
-                            console.log("✅ OTP SENT", data);
-                            currentStep = 2;
-                            $('#step1').hide();
-                            $('#step2').fadeIn();
-
-                            // Update button text based on language
-                            $('#sbn-btn').text(
-                                currentLang === 'hi' ? 'सत्यापित करें' :
-                                currentLang === 'gu' ? 'ચકાસો' :
-                                'VERIFY'
-                            );
-
-                            initValidation(currentLang);
-                            $('.otp-input').first().focus();
-                            $('#pageLoader').fadeOut();
-                        },
-                        function (error) {
-                            console.error("❌ SEND OTP FAILED", error);
-                            $('#pageLoader').fadeOut();
-                            alert(error?.message || "Failed to send OTP. Please try again.");
-                        }
-                    );
-                }
-
-                /* STEP 2 → VERIFY OTP */
-                else if (currentStep === 2) {
-                    let otp = '';
-                    $('.otp-input').each(function () {
-                        otp += $(this).val();
-                    });
-
-                    $('#otp').val(otp);
-
-                    if (!msg91Ready || typeof window.verifyOTP !== 'function') {
-                        alert("OTP service not ready");
-                        $('#pageLoader').fadeOut();
-                        return;
+                    if (currentStep === 2) {
+                        otpTouched = true;
                     }
 
-                    // Use the exposed verifyOTP method
-                    window.verifyOTP(
-                        otp,
-                        function (data) {
-                            console.log("✅ OTP VERIFIED", data);
-                            $('#pageLoader').fadeOut();
+                    if (!$(this).valid()) return;
 
-                            // Now submit your actual form data to backend
-                            submitFormData();
-                        },
-                        function (error) {
-                            console.error("❌ VERIFY OTP FAILED", error);
-                            $('#pageLoader').fadeOut();
-                            alert(error?.message || "Invalid OTP. Please try again.");
-                        }
-                    );
+                    $('#pageLoader').fadeIn();
+
+                    /* STEP 1 → SEND OTP */
+                    if (currentStep === 1) {
+                        currentMobile = $('#mobile').val();
+                        name = $('#name').val();
+                        $.ajax({
+                            url: "/send-otp",
+                            type: "POST",
+                            data: {
+                                name: name,
+                                identifier: '91' + currentMobile,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function (res) {
+                                currentStep = 2;
+                                $('#step2').fadeIn();
+                                $('#sbn-btn').text(
+                                    currentLang === 'hi' ? 'सत्यापित करें' :
+                                    currentLang === 'gu' ? 'ચકાસો' :
+                                    'VERIFY'
+                                );
+                                $('#otpLabel').text(
+                                    currentLang === 'hi' ? 'OTP दर्ज करें' :
+                                    currentLang === 'gu' ? 'OTP નાખો' :
+                                    'Enter OTP'
+                                );
+                                initValidation(currentLang);
+                                $('.otp-input').first().focus();
+                                $('#pageLoader').fadeOut();
+                                showOtpMessage('OTP sent successfully', 'success');
+                            },
+                            error: function (err) {
+                                showOtpMessage('OTP Failed', 'error');
+                            }
+                        });
+                    }
+
+                    /* STEP 2 → VERIFY OTP */
+                    else if (currentStep === 2) {
+                        let otp = '';
+                        $('.otp-input').each(function () {
+                            otp += $(this).val();
+                        });
+                        $('#otp').val(otp);
+                        $.ajax({
+                            url: "/verify-otp",
+                            type: "POST",
+                            data: {
+                                otp: otp,
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function (res) {
+                                if (res.verified_token) {
+                                    $.ajax({
+                                        url: "/verify-access-token",
+                                        type: "POST",
+                                        data: {
+                                            _token: "{{ csrf_token() }}"
+                                        },
+                                        success: function (innerRes) {
+                                            if (innerRes.success) {
+                                                showOtpMessage(innerRes.message, 'success');
+                                                window.location.href = "{{ route('product.list') }}";
+                                            } else {
+                                                showOtpMessage(innerRes.message, 'error');
+                                            }
+                                            $('#pageLoader').fadeOut();
+                                        },
+                                        error: function (err) {
+                                            showOtpMessage(err.message, 'error');
+                                        }
+                                    });
+                                }
+                            },
+                            error: function (err) {
+                                showOtpMessage(err.message, 'error');
+                            }
+                        });
+
+                    }
+                } catch (error) {
+                    showOtpMessage('Failed to send OTP', 'error');
+                } finally {
+                    $(this).prop('disabled', false);
                 }
             });
+            function showOtpMessage(message, type = 'success') {
+                const el = document.getElementById('otpMessage');
 
+                el.innerText = message;
+                el.classList.remove('otp-success', 'otp-error');
+                el.classList.add(type === 'success' ? 'otp-success' : 'otp-error');
+                el.style.display = 'block';
+            }
             $('.otp-input').on('input', function () {
                 this.value = this.value.replace(/\D/g, '');
-
                 if (this.value && $(this).next('.otp-input').length) {
                     $(this).next('.otp-input').focus();
                 }
-
                 updateOtp();
             });
 

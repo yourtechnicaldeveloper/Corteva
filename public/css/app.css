@@ -192,4 +192,13 @@ body {
     font-size: 14px;
     color: #333;
 }
-
+.otp-message {
+    font-size: 14px;
+    margin-top: 8px;
+}
+.otp-success {
+    color: #28a745;
+}
+.otp-error {
+    color: #dc3545;
+}

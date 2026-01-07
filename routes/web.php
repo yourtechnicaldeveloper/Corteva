@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (!session()->has('lang')) {
-        session(['lang' => 'en']);
+        session(['lang' => 'gu']);
     }
     $lang = session('lang');
     return view('front.register', compact('lang'));
@@ -15,4 +16,11 @@ Route::post('set-language', function (\Illuminate\Http\Request $request) {
     return response()->json(['status' => 'ok']);
 })->name('set.language');
 
+Route::post('/send-otp', [HomeController::class, 'SendOtp']);
+Route::post('/verify-otp', [HomeController::class, 'VerifyOtp']);
+Route::post('/verify-access-token', [HomeController::class, 'VerifyAccessToken']);
+
+Route::get('/product-list', function () {
+    return view('front.product-list');
+})->name('product.list');
 
