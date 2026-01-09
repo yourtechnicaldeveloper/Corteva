@@ -5,14 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Corteva Form</title>
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        {{-- <link rel="stylesheet" href="https://23c02a0b96d8.ngrok-free.app/css/app.css"> --}}
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <!-- Bootstrap JS (required) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <script src="https://control.msg91.com/app/assets/otp-provider/otp-provider.js"></script>
-
+        <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('js/jquery.validate.min.js') }}"></script>
+        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     </head>
     <body>
         <div id="pageLoader" style="display:none;">
@@ -25,7 +22,7 @@
             <div class="form-card">
                 <!-- Header -->
                 <nav class="navbar navbar-light bg-gray px-3 d-flex justify-content-between align-items-center sticky-top bg-white">
-                    <a class="navbar-brand m-0" href="#">
+                    <a class="navbar-brand m-0" href="{{ url('/') }}">
                         <img src="https://galileo.farmerconnect.in/static/media/logo.99f102123a31c266a6ea.jpg"
                             height="32"
                             alt="Corteva">
@@ -45,7 +42,7 @@
                 </nav>
 
                 <!-- English Banner Image -->
-                <div class="banner english_frm">
+                <div class="banner">
                     <img id="banner_img" alt="Corteva Banner">
                     <!-- Form -->
                     <form method="POST" class="register_frm" action="#">
@@ -71,8 +68,8 @@
                             </div>
                             <!-- Hidden field for validation -->
                             <input type="hidden" name="otp" id="otp">
-                            <p id="otpMessage" class="otp-message" style="display:none;"></p>
                         </div>
+                        <p id="otpMessage" class="otp-message" style="display:none;"></p>
                         <button type="submit" id="sbn-btn" class="btn-submit">
                             SUBMIT
                         </button>
@@ -267,25 +264,30 @@
                                 _token: "{{ csrf_token() }}"
                             },
                             success: function (res) {
-                                currentStep = 2;
-                                $('#step2').fadeIn();
-                                $('#sbn-btn').text(
-                                    currentLang === 'hi' ? 'सत्यापित करें' :
-                                    currentLang === 'gu' ? 'ચકાસો' :
-                                    'VERIFY'
-                                );
-                                $('#otpLabel').text(
-                                    currentLang === 'hi' ? 'OTP दर्ज करें' :
-                                    currentLang === 'gu' ? 'OTP નાખો' :
-                                    'Enter OTP'
-                                );
-                                initValidation(currentLang);
-                                $('.otp-input').first().focus();
+                                if (res.success) {
+                                    currentStep = 2;
+                                    $('#step2').fadeIn();
+                                    $('#sbn-btn').text(
+                                        currentLang === 'hi' ? 'सत्यापित करें' :
+                                        currentLang === 'gu' ? 'ચકાસો' :
+                                        'VERIFY'
+                                    );
+                                    $('#otpLabel').text(
+                                        currentLang === 'hi' ? 'OTP दर्ज करें' :
+                                        currentLang === 'gu' ? 'OTP નાખો' :
+                                        'Enter OTP'
+                                    );
+                                    initValidation(currentLang);
+                                    $('.otp-input').first().focus();
+                                    showOtpMessage(res.message, 'success');
+                                } else {
+                                    showOtpMessage(res.message, 'error');
+                                }
                                 $('#pageLoader').fadeOut();
-                                showOtpMessage('OTP sent successfully', 'success');
                             },
                             error: function (err) {
-                                showOtpMessage('OTP Failed', 'error');
+                                showOtpMessage(err.message, 'error');
+                                $('#pageLoader').fadeOut();
                             }
                         });
                     }
@@ -305,6 +307,8 @@
                                 _token: "{{ csrf_token() }}"
                             },
                             success: function (res) {
+                                console.log(res);
+
                                 if (res.verified_token) {
                                     $.ajax({
                                         url: "/verify-access-token",
@@ -323,25 +327,32 @@
                                         },
                                         error: function (err) {
                                             showOtpMessage(err.message, 'error');
+                                            $('#pageLoader').fadeOut();
                                         }
                                     });
+                                } else {
+                                    showOtpMessage(res.message, 'error');
+                                    $('#pageLoader').fadeOut();
                                 }
                             },
                             error: function (err) {
+                                console.log(err);
+
                                 showOtpMessage(err.message, 'error');
+                                $('#pageLoader').fadeOut();
                             }
                         });
 
                     }
                 } catch (error) {
-                    showOtpMessage('Failed to send OTP', 'error');
+                    showOtpMessage(error.message, 'error');
+                    $('#pageLoader').fadeOut();
                 } finally {
                     $(this).prop('disabled', false);
                 }
             });
             function showOtpMessage(message, type = 'success') {
                 const el = document.getElementById('otpMessage');
-
                 el.innerText = message;
                 el.classList.remove('otp-success', 'otp-error');
                 el.classList.add(type === 'success' ? 'otp-success' : 'otp-error');

@@ -166,7 +166,7 @@ body {
 #pageLoader {
     position: fixed;
     inset: 0;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.50);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -201,4 +201,88 @@ body {
 }
 .otp-error {
     color: #dc3545;
+}
+
+
+
+
+/* Card */
+.card {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 18px !important  ;
+    border: 2px solid #1b5e20 !important;
+    padding: 20px 18px !important;
+    text-align: center;
+}
+
+/* Title */
+.title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1b5e20;
+    margin-bottom: 6px;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 15px;
+    margin-bottom: 14px;
+}
+
+.inner_subtitle {
+    color: #555;
+}
+
+/* Product image */
+.product-image img {
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 18px;
+}
+
+/* Tick icon */
+.tick-icon img {
+    width: 56px;
+    height: auto;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+/* Bottom message */
+.bottom_message {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1b5e20;
+    line-height: 1.4;
+}
+
+/* -------- Mobile adjustments -------- */
+@media (max-width: 480px) {
+
+    .card {
+        padding: 16px 14px;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .product-image img {
+        width: 130px;
+    }
+
+    .tick-icon img {
+        width: 48px;
+    }
+
+    .bottom_message {
+        font-size: 14px;
+    }
 }
