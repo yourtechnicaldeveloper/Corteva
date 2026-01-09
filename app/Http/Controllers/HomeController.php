@@ -239,4 +239,12 @@ class HomeController extends Controller
             return redirect('/');
         }
     }
+    function Reward() {
+        $lang = session('lang');
+        if ($lang) {
+            return view('front.reward', compact('lang'));
+        } else {
+            return redirect('/');
+        }
+    }
 }

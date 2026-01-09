@@ -20,7 +20,6 @@ Route::post('/send-otp', [HomeController::class, 'SendOtp']);
 Route::post('/verify-otp', [HomeController::class, 'VerifyOtp']);
 Route::post('/verify-access-token', [HomeController::class, 'VerifyAccessToken']);
 Route::any('/product-list', [HomeController::class, 'ProductList'])->name('product.list');
-// Route::get('/product-list', function () {
-//     return view('front.product-list');
-// })->name('product.list');
+Route::any('/reward', [HomeController::class, 'Reward'])->name('reward');
+
 
