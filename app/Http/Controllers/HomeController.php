@@ -229,7 +229,7 @@ class HomeController extends Controller
             ], 422);
         }
     }
-    function ProductList() {
+    function ProductList(Request $request) {
         $lang = session('lang');
         $accessToken = session('msg91_access_token');
         if ($accessToken) {
@@ -243,6 +243,29 @@ class HomeController extends Controller
         $lang = session('lang');
         if ($lang) {
             return view('front.reward', compact('lang'));
+        } else {
+            return redirect('/');
+        }
+    }
+    function Scaning(Request $request) {
+        $qrCode = $request->qr_code;
+        if ("https://cf637a37c09b.ngrok-free.app/106a6c241b8797f52e1e77317b96a201" == $qrCode) {
+            return response()->json([
+                'success' => true,
+                'scanned_code' => $qrCode,
+                'message' => 'QR scanned successfully!'
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'scanned_code' => $qrCode,
+            'message' => 'QR code has been wrong'
+        ]);
+    }
+    function ViewCodes(Request $request) {
+        $lang = session('lang');
+        if ($lang) {
+            return view('front.view-codes', compact('lang'));
         } else {
             return redirect('/');
         }

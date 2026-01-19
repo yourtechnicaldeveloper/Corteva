@@ -91,19 +91,19 @@
                 'Enter OTP'
             );
             if (lang === 'en') {
-                $('#banner_img').attr('src', 'https://galileo.farmerconnect.in/static/media/HindiBanner.626e325b6dfc3acf4a68.png');
+                $('#banner_img').attr('src', "{{ asset('img/register-banner-hi.png') }}");
                 $('#name').attr('placeholder', 'Name');
                 $('#mobile').attr('placeholder', 'Mobile No.');
                 $('#sbn-btn').text('Submit');
                 $('#note').text('*Your profile is registered in Corteva Farmer Connect app and you authorize Corteva to contact you for future marketing activities.');
             } if (lang === 'gu') {
-                $('#banner_img').attr('src', 'https://galileo.farmerconnect.in/static/media/GujaratiBanner.71d88c2d56b8dbb7652b.png');
+                $('#banner_img').attr('src', "{{ asset('img/register-banner-guj.png') }}");
                 $('#name').attr('placeholder', 'નામ');
                 $('#mobile').attr('placeholder', 'મોબાઇલ નંબર');
                 $('#sbn-btn').text('સબમિટ કરો');
                 $('#note').text('*તમારી પ્રોફાઇલ Corteva Farmer connect એપ્લિકેશનમાં નોંધાયેલ છે અને તમે ભવિષ્યની માર્કેટિંગ પ્રવૃત્તિઓ માટે તમારો સંપર્ક કરવા કોર્ટવાને અધિકૃત કરો છો.');
             } else if (lang === 'hi'){
-                $('#banner_img').attr('src', 'https://galileo.farmerconnect.in/static/media/HindiBanner.626e325b6dfc3acf4a68.png');
+                $('#banner_img').attr('src', "{{ asset('img/register-banner-hi.png') }}");
                 $('#name').attr('placeholder', 'नाम');
                 $('#mobile').attr('placeholder', 'मोबाइल नं.');
                 $('#sbn-btn').text('जमा करें');
@@ -111,8 +111,8 @@
             }
             if (currentStep == 2) {
                 $('.btn-submit').text(
-                    lang === 'hi' ? 'जमा करें' :
-                    lang === 'gu' ? 'લોગિન' :
+                    lang === 'hi' ? 'लॉगिन करें​' :
+                    lang === 'gu' ? 'પ્રવેશ કરો' :
                     'LOGIN'
                 );
             }
@@ -277,6 +277,7 @@
                                     success: function (innerRes) {
                                         if (innerRes.success) {
                                             showOtpMessage(innerRes.message, 'success');
+
                                             window.location.href = "{{ route('product.list') }}";
                                         } else {
                                             showOtpMessage(innerRes.message, 'error');

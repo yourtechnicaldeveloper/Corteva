@@ -28,9 +28,9 @@
     });
     function initValidation(lang) {
         $('.title').text(
-            lang === 'hi' ? 'उत्पाद की प्रामाणिकता का सत्यापन' :
+            lang === 'hi' ? 'उत्पाद की प्रामाणिकता जाँच​' :
             lang === 'gu' ? 'ઉત્પાદનની અધિકૃતતાની ચકાસણી' :
-            'Verification of product authenticity'
+            'Product Authenticity Check'
         );
         $('.inner_subtitle').text(
             lang === 'hi' ? 'उत्पाद' :
@@ -38,14 +38,14 @@
             'Product'
         );
         $('.bottom_message').text(
-            lang === 'hi' ? 'यह कोर्टवा द्वारा निर्मित एक मूल उत्पाद है।' :
-            lang === 'gu' ? 'આ એક કોર્ટવા દ્વારા બનાવાયેલ અસલ ઉત્પાદન છે' :
-            'This is an original product made by Kortva.'
+            lang === 'hi' ? 'यह कॉर्टेवा द्वारा निर्मित एक वास्तविक उत्पाद है।' :
+            lang === 'gu' ? 'આ એક અસલી કોર્ટેવા દ્વારા ઉત્પાદિત ઉત્પાદન છે.' :
+            'This is a Genuine Corteva Manufactured Product'
         );
         $('.btn-name').text(
-            lang === 'hi' ? "स्वीकृति देने के लिए 'स्कैन एंड विन' दर्ज करें।" :
-            lang === 'gu' ? "મંજૂરીવા 'સ્કેન&વીન' દાખલ કરો" :
-            "Enter 'Scan&Win' to approve."
+            lang === 'hi' ? "कॉर्टेवा 'स्कैन & विन' से जुड़ें" :
+            lang === 'gu' ? "કોર્ટેવા 'સ્કેન&વીન' દાખલ કરો" :
+            "Enter Corteva ‘Scan & Win’"
         );
 
     }
