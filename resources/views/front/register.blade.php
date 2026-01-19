@@ -34,7 +34,7 @@
         </button>
     </form>
     <p class="note" id="note">
-        *Your profile is registered in 'Corteva Farmer Connect' app and you authorize Corteva to contact you for future marketing activities.
+        By clicking the submit button, You acknowledge reading and accepting our Terms & Conditions and Privacy Policy
     </p>
 </div>
 @endsection
@@ -95,19 +95,34 @@
                 $('#name').attr('placeholder', 'Name');
                 $('#mobile').attr('placeholder', 'Mobile No.');
                 $('#sbn-btn').text('Submit');
-                $('#note').text('*Your profile is registered in Corteva Farmer Connect app and you authorize Corteva to contact you for future marketing activities.');
+                // $('#note').text('By clicking the submit button, You acknowledge reading and accepting our Terms & Conditions and Privacy Policy');
+                $('#note').html(`
+                        By clicking the submit button, you acknowledge reading and accepting our
+                        <a href="https://farmerconnect.in/galileo-cumin/TC/english/" target="_blank">Terms & Conditions</a> and
+                        <a href="https://www.corteva.com/privacy.html" target="_blank">Privacy Policy</a>.
+                    `);
             } if (lang === 'gu') {
                 $('#banner_img').attr('src', "{{ asset('img/register-banner-guj.png') }}");
                 $('#name').attr('placeholder', 'નામ');
                 $('#mobile').attr('placeholder', 'મોબાઇલ નંબર');
                 $('#sbn-btn').text('સબમિટ કરો');
-                $('#note').text('*તમારી પ્રોફાઇલ Corteva Farmer connect એપ્લિકેશનમાં નોંધાયેલ છે અને તમે ભવિષ્યની માર્કેટિંગ પ્રવૃત્તિઓ માટે તમારો સંપર્ક કરવા કોર્ટવાને અધિકૃત કરો છો.');
+                $('#note').html(`
+                    'સબમિટ' બટન ક્લિક કરીને, તમે અમારી
+                    <a href="https://farmerconnect.in/galileo-cumin/TC/english/" target="_blank">શરતો અને નિયમો</a> અને
+                    <a href="https://www.corteva.com/privacy.html" target="_blank">ગોપનીયતા નીતિ</a>
+                    વાંચી અને સ્વીકારી હોવાનો સ્વીકાર કરો છો.
+                `);
             } else if (lang === 'hi'){
                 $('#banner_img').attr('src', "{{ asset('img/register-banner-hi.png') }}");
                 $('#name').attr('placeholder', 'नाम');
                 $('#mobile').attr('placeholder', 'मोबाइल नं.');
                 $('#sbn-btn').text('जमा करें');
-                $('#note').text('*आपकी प्रोफ़ाइल Corteva Farmer connect ऐप में पंजीकृत है और आप भविष्य की मार्केटिंग गतिविधियों के लिए आपसे संपर्क करने के लिए कोर्टेवा को अधिकृत करते हैं।');
+                $('#note').html(`
+                    ‘आगे बढ़ें’ बटन पर क्लिक करके, आप हमारी
+                    <a href="https://farmerconnect.in/galileo-cumin/TC/english/" target="_blank">नियम और शर्तें</a> तथा
+                    <a href="https://www.corteva.com/privacy.html" target="_blank">गोपनीयता नीति</a>
+                    पढ़ने और स्वीकार करने की पुष्टि करते हैं।
+                `);
             }
             if (currentStep == 2) {
                 $('.btn-submit').text(
