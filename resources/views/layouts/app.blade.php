@@ -19,7 +19,9 @@
 
 <div class="page-wrapper">
     <div class="form-card">
-
+        <div id="pageLoader" style="display: none">
+            <div class="spinner"></div>
+        </div>
         {{-- Common Header --}}
         @include('common.header')
 

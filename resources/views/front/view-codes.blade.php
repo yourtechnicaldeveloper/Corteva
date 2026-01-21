@@ -10,7 +10,7 @@
             </div>
             <!-- Score -->
             <div class="score-box">
-                <span class="score-text">એકર - મર્યાદા </span>: 0.00/10
+                <span class="score-text">એકર - મર્યાદા:</span>{{ ($checkCustomerAcres)? (float) $checkCustomerAcres->acres:0.00 }}/10
                 <span class="progress-item-small active"></span>
                 <span class="score-box-label-1 label">છંટકાવ કર્યો</span>
                 <span class="progress-item-small"></span>
@@ -20,7 +20,7 @@
             <!-- Progress Boxes -->
             <div class="progress-grid">
                 @for($i = 1; $i <= 10; $i++)
-                    <div class="progress-item {{ $i <= 2 ? 'active' : '' }}"></div>
+                    <div class="progress-item {{ $i <= $checkCustomerAcres->acres ? 'active' : '' }}"></div>
                 @endfor
             </div>
             <!-- Product Details -->
@@ -37,7 +37,7 @@
         </div>
         <!-- Button -->
         <div class="reward-footer">
-            <a href="{{ url('/') }}" class="btn footer-btn">
+            <a href="{{ url('/reward-more') }}" class="btn footer-btn">
                 હોમ પેજ પર જાઓ
             </a>
         </div>
@@ -62,8 +62,8 @@
             'Product Name'
         );
         $('.product-box-label-2').text(
-            lang === 'hi' ? 'स्कैन करें और जीतने का कोड' :
-            lang === 'gu' ? 'ટેગ અથવા લાઇવ કોડ' :
+            lang === 'hi' ? 'स्कैन और जीतने का कोड' :
+            lang === 'gu' ? 'સ્કેન અને વિન કોડ' :
             'Scan and win code'
         );
         $('.footer-btn').text(
@@ -72,9 +72,9 @@
             'Back to Home Page'
         );
         $('.score-text').text(
-            lang === 'hi' ? 'स्प्रे - एकड़ सीमा' :
-            lang === 'gu' ? 'એકર - મર્યાદા' :
-            'Spray - Acres Acres Limit'
+            lang === 'hi' ? 'स्प्रे - एकड़ सीमा:' :
+            lang === 'gu' ? 'એકર - મર્યાદા એકર - મર્યાદા:' :
+            'Spray - Acres Acres Limit:'
         );
         $('.score-box-label-1').text(
             lang === 'hi' ? 'स्प्रे किया गया' :

@@ -16,7 +16,6 @@ class CheckAccessToken
     public function handle(Request $request, Closure $next): Response
     {
         $accessToken = session('msg91_access_token');
-
         if (!$accessToken) {
             return redirect('/')
                 ->with('error', 'Unauthorized access');

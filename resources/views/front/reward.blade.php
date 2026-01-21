@@ -40,11 +40,17 @@
 @endsection
 @push('scripts')
 <script>
+    const scanWinText = {
+        gu: `તમને <strong>GALILEO (400ML)</strong> ખરીદી પર <span>3 સ્કેન અને વિન કોડ્સ</span> પ્રાપ્ત થયા છે.`,
+        hi: `आपको <strong>GALILEO (400ML)</strong> की खरीद पर <span>3 स्कैन एंड विन कोड</span> प्राप्त हुए हैं।`,
+        en: `You have received <span>3 Scan & Win codes</span> on purchase of <strong>GALILEO (400ML)</strong>.`
+    };
     let currentLang = "{{ $lang }}";
     $(document).ready(function() {
         initValidation(currentLang);
     });
     function initValidation(lang) {
+        $('.status-message').html(scanWinText[lang]);
         $('.status-title').text(
             lang === 'hi' ? 'बधाई हो!!!' :
             lang === 'gu' ? 'અભિનંદન !!!' :
@@ -52,7 +58,7 @@
         );
         $('.first-btn').text(
             lang === 'hi' ? 'कोड देखो' :
-            lang === 'gu' ? 'રકમ જુઓ' :
+            lang === 'gu' ? 'કોડ્સ જુઓ' :
             'View Codes'
         );
         $('.second-btn').text(
@@ -61,12 +67,12 @@
             'Scan More'
         );
         $('.scan-title').text(
-            lang === 'hi' ? 'बोतल पर दिए गए क्यूआर कोड को स्कैन करें।' :
-            lang === 'gu' ? 'બોટલ પર આપેલ QR કોડ સ્કેન કરો.' :
+            lang === 'hi' ? 'बोतल पर दिया क्यूआर कोड स्कैन करें।' :
+            lang === 'gu' ? 'બોટલ પર QR કોડ સ્કેન કરો.' :
             'Scan the QR code given on the bottle'
         );
         $('.scan-btn').text(
-            lang === 'hi' ? 'स्कैन' :
+            lang === 'hi' ? 'स्कैन करें' :
             lang === 'gu' ? 'સ્કેન કરો' :
             'Scan'
         );

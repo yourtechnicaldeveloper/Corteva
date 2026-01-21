@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Product Verification')
+@section('title', 'Registration')
 @section('content')
 <div class="banner">
     <img id="banner_img" class="banner_img" alt="Corteva Banner">
@@ -13,9 +13,14 @@
             <div class="form-group">
                 <input type="tel" name="mobile" id="mobile" placeholder="Mobile No." required>
             </div>
-
         </div>
-        <div id="step2" style="display:none;">
+        <div id="step2" style="display: none">
+            <div class="form-group">
+
+                <input type="text" name="acres" id="acres" placeholder="Acres">
+            </div>
+        </div>
+        <div id="step3" style="display:none;">
             <p id="otpLabel" class="otp-title">Enter OTP</p>
             <div class="otp-wrapper">
                 <input type="text" class="otp-input" maxlength="1">
@@ -42,12 +47,14 @@
     <script>
         /* Init on page load */
         let currentStep = 1;
+        let acresTouched = false;
         let otpTouched = false;
         let msg91Ready = false;
         let currentMobile = '';
         let name = '';
         let currentLang = "{{ $lang }}";
         let msg91Instance = null;
+        let isTermsCondition = false;
         $(document).ready(function() {
             initValidation(currentLang);
         });
@@ -55,26 +62,33 @@
         /* Language-wise Messages */
         const validationMessages = {
             en: {
-                name_required: "Name is required",
+                name_required: "Please enter your name",
                 name_min: "Name must be at least 3 characters",
-                mobile_required: "Mobile number is required",
+                mobile_required: "Please enter mobile number",
                 mobile_digits: "Please enter a valid 10 digit mobile number",
+                acres_required: "Please enter acres",
+                acres_digits: "Please enter a valid digit",
                 otp_required: "OTP is required",
-                otp_invalid: "Please enter a valid OTP"
+                otp_invalid: "Please enter a valid OTP",
+
             },
             hi: {
-                name_required: "नाम आवश्यक है",
+                name_required: "कृपया अपना नाम दर्ज करें",
                 name_min: "नाम कम से कम 3 अक्षरों का होना चाहिए",
-                mobile_required: "मोबाइल नंबर आवश्यक है",
+                mobile_required: "कृपया मोबाइल नंबर दर्ज करें",
                 mobile_digits: "कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें",
+                acres_required: "कृपया एकड़ दर्ज करें",
+                acres_digits: "कृपया मान्य अंक दर्ज करें",
                 otp_required: "OTP आवश्यक है",
                 otp_invalid: "मान्य OTP दर्ज करें"
             },
             gu: {
-                name_required: "નામ ફરજિયાત છે",
+                name_required: "કૃપા કરીને તમારું નામ દાખલ કરો",
                 name_min: "નામ ઓછામાં ઓછા 3 અક્ષરનું હોવું જોઈએ",
-                mobile_required: "મોબાઇલ નંબર ફરજિયાત છે",
+                mobile_required: "કૃપા કરીને મોબાઇલ નંબર દાખલ કરો",
                 mobile_digits: "કૃપા કરીને માન્ય 10 અંકનો મોબાઇલ નંબર દાખલ કરો",
+                acres_required: "કૃપા કરીને એકર દાખલ કરો",
+                acres_digits: "કૃપા કરીને માન્ય અંક દાખલ કરો",
                 otp_required: "OTP જરૂરી છે",
                 otp_invalid: "માન્ય OTP દાખલ કરો"
             }
@@ -82,7 +96,6 @@
         function getActiveForm() {
             return $(".register_frm:visible");
         }
-
         /* Language-wise validation */
         function initValidation(lang) {
             $('#otpLabel').text(
@@ -94,8 +107,8 @@
                 $('#banner_img').attr('src', "{{ asset('img/register-banner-hi.png') }}");
                 $('#name').attr('placeholder', 'Name');
                 $('#mobile').attr('placeholder', 'Mobile No.');
+                $('#acres').attr('placeholder', 'Acres');
                 $('#sbn-btn').text('Submit');
-                // $('#note').text('By clicking the submit button, You acknowledge reading and accepting our Terms & Conditions and Privacy Policy');
                 $('#note').html(`
                         By clicking the submit button, you acknowledge reading and accepting our
                         <a href="https://farmerconnect.in/galileo-cumin/TC/english/" target="_blank">Terms & Conditions</a> and
@@ -105,6 +118,7 @@
                 $('#banner_img').attr('src', "{{ asset('img/register-banner-guj.png') }}");
                 $('#name').attr('placeholder', 'નામ');
                 $('#mobile').attr('placeholder', 'મોબાઇલ નંબર');
+                $('#acres').attr('placeholder', 'એકર');
                 $('#sbn-btn').text('સબમિટ કરો');
                 $('#note').html(`
                     'સબમિટ' બટન ક્લિક કરીને, તમે અમારી
@@ -116,6 +130,7 @@
                 $('#banner_img').attr('src', "{{ asset('img/register-banner-hi.png') }}");
                 $('#name').attr('placeholder', 'नाम');
                 $('#mobile').attr('placeholder', 'मोबाइल नं.');
+                $('#acres').attr('placeholder', 'एकड़');
                 $('#sbn-btn').text('जमा करें');
                 $('#note').html(`
                     ‘आगे बढ़ें’ बटन पर क्लिक करके, आप हमारी
@@ -124,7 +139,7 @@
                     पढ़ने और स्वीकार करने की पुष्टि करते हैं।
                 `);
             }
-            if (currentStep == 2) {
+            if (currentStep == 3) {
                 $('.btn-submit').text(
                     lang === 'hi' ? 'लॉगिन करें​' :
                     lang === 'gu' ? 'પ્રવેશ કરો' :
@@ -139,7 +154,6 @@
             }
             let rules = {};
             let messages = {};
-
             if (currentStep === 1) {
                 rules = {
                     name: { required: true, minlength: 3 },
@@ -159,8 +173,24 @@
                     }
                 };
             }
-
             if (currentStep === 2) {
+                rules = {
+                    acres: {
+                        required: function () {
+                            return acresTouched;
+                        },
+                        digits: true
+                    }
+                };
+
+                messages = {
+                    acres: {
+                        required: validationMessages[lang].acres_required,
+                        digits: validationMessages[lang].acres_digits
+                    }
+                };
+            }
+            if (currentStep === 3) {
                 rules = {
                     otp: {
                         required: function () {
@@ -215,44 +245,52 @@
         $('.register_frm').on('submit', async function(e) {
             try {
                 e.preventDefault();
-
                 if (currentStep === 2) {
+                    acresTouched = true;
+                    isTermsCondition = true;
+                }
+                if (currentStep === 3) {
                     otpTouched = true;
                 }
-
                 if (!$(this).valid()) return;
-
                 $('#pageLoader').fadeIn();
-
                 /* STEP 1 → SEND OTP */
-                if (currentStep === 1) {
+                if (currentStep === 1 || currentStep === 2) {
                     currentMobile = $('#mobile').val();
                     name = $('#name').val();
+                    acres = $('#acres').val();
                     $.ajax({
                         url: "/send-otp",
                         type: "POST",
                         data: {
                             name: name,
                             identifier: '91' + currentMobile,
+                            acres: acres,
                             _token: "{{ csrf_token() }}"
                         },
                         success: function (res) {
                             if (res.success) {
-                                currentStep = 2;
-                                $('#step2').fadeIn();
-                                $('#sbn-btn').text(
-                                    currentLang === 'hi' ? 'सत्यापित करें' :
-                                    currentLang === 'gu' ? 'ચકાસો' :
-                                    'VERIFY'
-                                );
-                                $('#otpLabel').text(
-                                    currentLang === 'hi' ? 'OTP दर्ज करें' :
-                                    currentLang === 'gu' ? 'OTP નાખો' :
-                                    'Enter OTP'
-                                );
-                                initValidation(currentLang);
-                                $('.otp-input').first().focus();
-                                showOtpMessage(res.message, 'success');
+                                if (res.message == 'acres') {
+                                    currentStep = 2;
+                                    $('#step2').fadeIn();
+                                    initValidation(currentLang);
+                                } else {
+                                    currentStep = 3;
+                                    $('#step3').fadeIn();
+                                    $('#sbn-btn').text(
+                                        currentLang === 'hi' ? 'सत्यापित करें' :
+                                        currentLang === 'gu' ? 'ચકાસો' :
+                                        'VERIFY'
+                                    );
+                                    $('#otpLabel').text(
+                                        currentLang === 'hi' ? 'OTP दर्ज करें' :
+                                        currentLang === 'gu' ? 'OTP નાખો' :
+                                        'Enter OTP'
+                                    );
+                                    initValidation(currentLang);
+                                    $('.otp-input').first().focus();
+                                    showOtpMessage(res.message, 'success');
+                                }
                             } else {
                                 showOtpMessage(res.message, 'error');
                             }
@@ -265,8 +303,8 @@
                     });
                 }
 
-                /* STEP 2 → VERIFY OTP */
-                else if (currentStep === 2) {
+                /* STEP 3 → VERIFY OTP */
+                else if (currentStep === 3) {
                     let otp = '';
                     $('.otp-input').each(function () {
                         otp += $(this).val();
@@ -280,8 +318,6 @@
                             _token: "{{ csrf_token() }}"
                         },
                         success: function (res) {
-                            console.log(res);
-
                             if (res.verified_token) {
                                 $.ajax({
                                     url: "/verify-access-token",
@@ -292,8 +328,12 @@
                                     success: function (innerRes) {
                                         if (innerRes.success) {
                                             showOtpMessage(innerRes.message, 'success');
+                                            if (isTermsCondition) {
+                                                window.location.href = "{{ route('terms.conditions') }}";
+                                            } else {
+                                                window.location.href = "{{ route('product.list') }}";
+                                            }
 
-                                            window.location.href = "{{ route('product.list') }}";
                                         } else {
                                             showOtpMessage(innerRes.message, 'error');
                                         }

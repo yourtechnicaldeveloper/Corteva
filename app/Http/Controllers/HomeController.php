@@ -17,11 +17,27 @@ class HomeController extends Controller
                 'name' => 'required',
                 'identifier' => 'required'
             ]);
+            $acres = ($request->acres)?$request->acres:null;
+            if ($acres) {
+                User::updateOrCreate(
+                    [ 'mobile' => $request->identifier ],   // condition (WHERE)
+                    [ 'name' => $request->name, 'acres' => $acres ]    // data to update or insert
+                );
+            }
+            $checkCustomerAcres = User::where('mobile', $request->identifier)->whereNotNull('acres')->first();
+            if ($checkCustomerAcres == null) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'acres',
+                ]);
+            }
             $lang = session('lang');
-            User::create([
-                'name' => $request->name,
-                'mobile' => $request->identifier,
-            ]);
+            if ($acres == null) {
+                User::create([
+                    'name' => $request->name,
+                    'mobile' => $request->identifier,
+                ]);
+            }
             $curl = curl_init();
             curl_setopt_array($curl, [
                 CURLOPT_URL => "https://api.msg91.com/api/v5/widget/sendOtp",
@@ -49,6 +65,7 @@ class HomeController extends Controller
             $type    = $data['type'] ?? null;
             if ($type === 'success') {
                 session()->put('msg91_request_id', $message);
+                session()->put('identifier', $request->identifier);
             }
             $messages = [
                 'en' => 'Sucessfully send OTP.',
@@ -229,6 +246,19 @@ class HomeController extends Controller
             ], 422);
         }
     }
+    function TermsCondition(Request $request) {
+        try {
+            $lang = session('lang');
+            $accessToken = session('msg91_access_token');
+            if ($accessToken) {
+                return view('front.terms-condition', compact('lang'));
+            } else {
+                return redirect('/');
+            }
+        } catch (Exception $ex) {
+            return redirect('/');
+        }
+    }
     function ProductList(Request $request) {
         $lang = session('lang');
         $accessToken = session('msg91_access_token');
@@ -265,9 +295,53 @@ class HomeController extends Controller
     function ViewCodes(Request $request) {
         $lang = session('lang');
         if ($lang) {
-            return view('front.view-codes', compact('lang'));
+            $mobile = session('identifier');
+            $checkCustomerAcres = User::where('mobile', $mobile)->whereNotNull('acres')->first();
+            return view('front.view-codes', compact('lang', 'checkCustomerAcres'));
         } else {
             return redirect('/');
         }
     }
+    function RewardMore(Request $request) {
+        $lang = session('lang');
+        if ($lang) {
+            return view('front.reward-more', compact('lang'));
+        } else {
+            return redirect('/');
+        }
+    }
+    function UpdateAcres(Request $request) {
+        $lang = session('lang');
+        if ($lang) {
+            $mobile = session('identifier');
+            $getCustomerAcres = User::where('mobile', $mobile)->whereNotNull('acres')->first();
+            return view('front.update-acres', compact('lang', 'getCustomerAcres'));
+        } else {
+            return redirect('/');
+        }
+    }
+    function UpdateNewAcres(Request $request) {
+        try {
+            $mobile = session('identifier');
+            if ($mobile) {
+                User::where('mobile', $mobile)->whereNotNull('acres')->update(
+                    [ 'acres' => $request->acres ]
+                );
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Update successfully'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong!!!'
+            ]);
+        } catch (Exception $ex) {
+             return response()->json([
+                'success' => false,
+                'message' =>'Something went wrong!!!'
+            ], 422);
+        }
+    }
+
 }
